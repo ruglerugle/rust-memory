@@ -40,11 +40,11 @@
 <script>
 const stages=[
 {
- title:'第1章　消えた勇者',nav:'解放後使用',mission:'アキが勇者を消した後、ボブが古い操作先を使うと何が起きるか確認してください。',
- dialogue:[['うさ美','C言語では、メモリを好きなタイミングで消せるんですよね。'],['ねこ先生','はい。ただし、ほかの処理がまだ使っていないかも、自分で管理する必要があります。']],
- cActions:[['destroy','アキが勇者を消す','ボブがまだ利用している状態で召喚解除します'],['use','ボブが勇者を動かす','残っている古い操作先を使います']],
+ title:'第1章　消えた勇者',nav:'解放後使用',mission:'アキが勇者を消した後、ボブが消えたはずの勇者への参照を使うと何が起きるか確認してください。',
+ dialogue:[['うさ美','C言語では、メモリを好きなタイミングで消せるんですよね。'],['ねこ先生','はい。ただし、ほかの処理がまだ使っているかどうかも、自分で管理する必要があります。']],
+ cActions:[['destroy','アキが勇者を消す','ボブがまだ利用している状態で召喚解除します'],['use','ボブが勇者を動かす','消えたはずの勇者への参照を使います']],
  rActions:[['tryDestroy','アキが勇者を消そうとする','ボブが利用中なので、まず止められるか確認します'],['finish','ボブが利用を終える','勇者への借用を終了します'],['safeDestroy','アキが勇者を消す','誰も使っていない状態で片付けます']],
- lesson:'所有権は「誰が使えるか」だけでなく、「誰が最後に片付けるか」を決めます。借用中のデータを先に破棄できないため、消えたメモリを使う事故を防げます。',terms:[['use-after-free','解放済みメモリを再び使う事故'],['所有権','データを最後に片付ける責任の所在'],['借用','所有権を渡さず一時的に使わせる仕組み']]
+ lesson:'所有権は「誰が使えるか」だけでなく、「誰が最後に片付けるか」を決めます。借用中のデータを先に破棄できないため、消えたメモリを使う事故を防げます。',terms:[['use-after-free','解放済みメモリを再び使う事故'],['所有権','データを最後まで管理し、後片付けをする責任を持つこと'],['借用','所有権を渡さず一時的に使わせる仕組み']]
 },
 {
  title:'第2章　二度目の召喚解除',nav:'二重解放',mission:'アキとボブが同じ勇者を管理していると、片付け時に何が起きるか確認してください。',
@@ -61,17 +61,17 @@ const stages=[
  lesson:'可変借用中にほかの参照を許さないのは、変更途中の不完全な状態を外部から読ませないためです。「着替え中は見られない」という制約が、データの整合性を守ります。',terms:[['共有借用','読むだけなら複数存在できる参照'],['可変借用','変更できる一時的かつ排他的な参照']]
 },
 {
- title:'第4章　消えた100ゴールド',nav:'同時変更',mission:'1000Gから2人が同時に100Gずつ使い、更新が失われる様子を確認してください。',
+ title:'第4章　消えた100ゴールド',nav:'同時変更',mission:'勇者パーティの資金1000Gから、アキとボブが同時に100Gずつ使い、更新が失われる様子を確認してください。',
  dialogue:[['うさ美','2人が同時に100G使えば、800Gになるだけですよね。'],['ねこ先生','両方が最初の1000Gを読んでから書き戻すと、900Gになる場合があります。']],
  cActions:[['readA','アキが1000Gを読む','100G使う計算を始めます'],['readB','ボブも1000Gを読む','同じ古い値を読みます'],['writeA','アキが900Gを書き込む','計算結果を反映します'],['writeB','ボブも900Gを書き込む','アキの更新を上書きします']],
  rActions:[['lockA','アキが財布を確保する','変更者を1人にします'],['waitB','ボブは順番待ちする','同時変更せず待機します'],['spendA','アキが100G使う','1000Gから900Gにします'],['spendB','ボブが100G使う','900Gから800Gにします']],
- lesson:'変更者を同時に1人へ制限するのは、複数処理が同じ古い値を読み、片方の更新を消してしまうデータ競合を防ぐためです。スレッド間ではMutexなどで順番を管理します。',terms:[['データ競合','複数処理が同じデータへ同時にアクセスし、少なくとも1つが変更する状態'],['Mutex','共有データを1人ずつ変更させる仕組み']]
+ lesson:'変更者を同時に1人へ制限するのは、複数処理が同じ古い値を読み、片方の更新を消してしまうデータ競合を防ぐためです。スレッド間ではMutexなどで順番を管理します。',terms:[['データ競合','複数の処理が同時に同じデータを読み書きし、結果が想定と変わってしまうこと'],['Mutex','共有データを1人ずつ変更させる仕組み']]
 },
 {
  title:'第5章　残された案内矢印',nav:'ライフタイム',mission:'勇者を指す案内矢印を残したまま、勇者を先に消すと何が起きるか確認してください。',
  dialogue:[['うさ美','参照は、データの場所を覚えているだけですよね。'],['ねこ先生','だからこそ、本体が消えた後も場所だけ残ると危険です。']],
- cActions:[['arrow','キャロルが案内矢印を持つ','勇者の場所を参照します'],['destroy','勇者を消す','参照だけを残します'],['follow','案内矢印をたどる','存在しない勇者へアクセスします']],
- rActions:[['borrow','キャロルが勇者を見る','本体がある間だけ参照します'],['tryDestroy','勇者を先に消そうとする','参照中の破棄を試みます'],['end','キャロルが見るのを終える','参照の寿命を終了します'],['destroySafe','その後、勇者を消す','参照がない状態で破棄します']],
+ cActions:[['arrow','ボブが案内矢印を持つ','勇者の場所を参照します'],['destroy','勇者を消す','参照だけを残します'],['follow','案内矢印をたどる','存在しない勇者へアクセスします']],
+ rActions:[['borrow','ボブが勇者を見る','本体がある間だけ参照します'],['tryDestroy','勇者を先に消そうとする','参照中の破棄を試みます'],['end','ボブが見るのを終える','参照の寿命を終了します'],['destroySafe','その後、勇者を消す','参照がない状態で破棄します']],
  lesson:'ライフタイムは、参照が参照先より長生きしないことを保証します。これにより、存在しないデータや同じ場所に後から置かれた別データを誤って操作する事故を防ぎます。',terms:[['ダングリングポインタ','参照先が消えた後も残っているポインタ'],['ライフタイム','参照が安全に使える期間']]
 }
 ];
@@ -109,7 +109,7 @@ function act(id){
  if(s===1){if(mode==='c'){if(id==='destroyA'){state.hero=false;add('アキが勇者を消しました。')}if(id==='destroyB'){state.hero?add('ボブが勇者を消しました。'):crash('ボブが同じ勇者をもう一度消し、メモリ管理領域が壊れました。')}}else{if(id==='move'){state.owner='ボブ';add('管理担当をアキからボブへ移しました。')}if(id==='oldDestroy')block(state.owner==='ボブ'?'アキはもう所有者ではありません。':'先に所有権を移してください。');if(id==='newDestroy'){state.owner==='ボブ'?(state.hero=false,clearStage('現在の所有者であるボブが、1回だけ安全に破棄しました。')):block('ボブは所有者ではありません。')}}}
  if(s===2){if(mode==='c'){if(id==='remove'){state.def=0;state.changing=true;add('古い鎧を脱ぎ、防御力が一時的に0になりました。')}if(id==='read'){state.def===0?crash('ボブが変更途中の防御力0を読み、誤った撤退判断をしました。'):add(`ボブは防御力${state.def}を読みました。`)}if(id==='equip'){state.def=150;state.changing=false;add('新しい鎧を着て、防御力が150になりました。')}}else{if(id==='change'){state.changing=true;add('勇者を更衣室に入れ、排他的な変更を始めました。')}if(id==='peek')block(state.changing?'変更途中の値は読めません。':'まだ変更中ではありません。');if(id==='complete'){state.changing?(state.def=150,state.changing=false,clearStage('変更が終わってから、防御力150を公開しました。')):block('先に着替えを始めてください。')}}}
  if(s===3){if(mode==='c'){if(id==='readA'){state.aRead=state.gold;add(`アキが${state.gold}Gを読みました。`)}if(id==='readB'){state.bRead=state.gold;add(`ボブも${state.gold}Gを読みました。`)}if(id==='writeA'){state.aRead==null?add('先にアキが所持金を読んでください。'):(state.gold=state.aRead-100,add('アキが900Gを書き込みました。'))}if(id==='writeB'){state.bRead==null?add('先にボブが所持金を読んでください。'):(state.gold=state.bRead-100,(state.aRead===1000&&state.bRead===1000)?crash('200G使ったのに900Gです。アキの更新が消えました。'):add('ボブが結果を書き込みました。'))}}else{if(id==='lockA'){state.locked='アキ';add('アキが財布の変更権を確保しました。')}if(id==='waitB'){state.locked==='アキ'?(state.queued=true,add('ボブは順番待ちに入りました。')):block('先にアキが変更権を確保してください。')}if(id==='spendA'){state.locked==='アキ'?(state.gold-=100,state.locked=null,add('アキが100G使い、900Gになりました。')):block('アキは変更権を持っていません。')}if(id==='spendB'){state.queued&&!state.locked?(state.gold-=100,clearStage('ボブが順番に100G使い、正しく800Gになりました。')):block('アキの処理後、ボブが順番待ちしている必要があります。')}}}
- if(s===4){if(mode==='c'){if(id==='arrow'){state.arrow=true;add('キャロルが勇者への案内矢印を持ちました。')}if(id==='destroy'){state.hero=false;add('勇者を消しましたが、案内矢印は残っています。')}if(id==='follow'){state.arrow&&!state.hero?crash('キャロルが案内をたどりましたが、参照先はもう存在しません。'):add('案内矢印をたどりました。')}}else{if(id==='borrow'){state.arrow=true;add('キャロルが勇者を一時的に参照しています。')}if(id==='tryDestroy')block(state.arrow?'参照が残っているため、勇者を消せません。':'参照はありません。');if(id==='end'){state.arrow=false;add('キャロルが見るのを終え、参照がなくなりました。')}if(id==='destroySafe'){state.arrow?block('先に参照を終了してください。'):(state.hero=false,clearStage('参照が先に終了したため、安全に勇者を消しました。'))}}}
+ if(s===4){if(mode==='c'){if(id==='arrow'){state.arrow=true;add('ボブが勇者への案内矢印を持ちました。')}if(id==='destroy'){state.hero=false;add('勇者を消しましたが、案内矢印は残っています。')}if(id==='follow'){state.arrow&&!state.hero?crash('ボブが案内をたどりましたが、参照先はもう存在しません。'):add('案内矢印をたどりました。')}}else{if(id==='borrow'){state.arrow=true;add('ボブが勇者を一時的に参照しています。')}if(id==='tryDestroy')block(state.arrow?'参照が残っているため、勇者を消せません。':'参照はありません。');if(id==='end'){state.arrow=false;add('ボブが見るのを終え、参照がなくなりました。')}if(id==='destroySafe'){state.arrow?block('先に参照を終了してください。'):(state.hero=false,clearStage('参照が先に終了したため、安全に勇者を消しました。'))}}}
  render();}
 function rewind(){mode='rust';crashed=false;logs=[{text:'時間を巻き戻しました。Rustのコンパイラが危険な操作を事前に確認します。',type:'blocked'}];state={hero:true,bobUsing:s===0,owner:'アキ',def:100,changing:false,gold:1000,aRead:null,bRead:null,locked:null,queued:false,arrow:false,step:0};render()}
 $('btn-reset').onclick=fresh;$('btn-rewind').onclick=rewind;$('btn-next').onclick=()=>{if(s<stages.length-1){s++;fresh()}else{alert('全ステージクリアです。Rustの制約は、Cで実行後に発覚するメモリ事故を、実行前に止めるためにあります。')}};$('tab-c').onclick=()=>{if(!cleared.has(s)){fresh()}};$('tab-rust').onclick=()=>{if(crashed)rewind()};
